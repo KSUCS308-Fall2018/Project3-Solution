@@ -16,8 +16,8 @@ typedef struct LinkedList {
     struct LinkedList * next;
 } LinkedList;
 
-LinkedList * reverse(LinkedList * list);
-LinkedList * advance_list(LinkedList * list, int steps);
+LinkedList * append(LinkedList *, Token *);
+LinkedList * advance_list(LinkedList * , int);
 void free_list(LinkedList * list);
 
 #endif /* linked_list_h */

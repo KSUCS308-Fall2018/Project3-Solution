@@ -7,6 +7,7 @@
 //
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "core.h"
 #include "types.h"
@@ -20,53 +21,43 @@ LinkedList * lex(char * input) {
     while (t != NULL) {
         input += read;
         
-        LinkedList * new = malloc(sizeof(LinkedList));
-        new->next = head;
-        new->value = t;
-        head = new;
+        head = append(head, t);
         
         read = 0;
         t = tokenize(input, &read);
     }
     
-    return reverse(head);
+    return head;
 }
 
-AST * parse(LinkedList * tokens, int * consumed) {
-    AST * tree = NULL;
-    
-    if(tokens == NULL || tokens->value == NULL) {
-        return NULL;
+int parse(AST * tree, LinkedList * tokens) {
+    if(tree == NULL || tokens == NULL || tokens->value == NULL) {
+        return 0;
     }
-    
-    tree = malloc(sizeof(AST));
-    
+
     int count = 0;
-    int partial_count = 0;
+
     switch (tokens->value->type) {
         case ADD:
         case SUBTRACT:
         case MULTIPLY:
             tree->value = copy_token(tokens->value);
-            count = 1;
+            count++;
             
-            partial_count = 0;
-            tree->left = parse(tokens->next, &partial_count);
-            count += partial_count;
+            tree->left = malloc(sizeof(AST));
+            count += parse(tree->left, tokens->next);
             
-            partial_count = 0;
-            tree->right = parse(advance_list(tokens, count), &partial_count);
-            *consumed = count + partial_count;
+            tree->right = malloc(sizeof(AST));
+            count += parse(tree->right, advance_list(tokens, count));
             break;
         case INTEGER:
-            *consumed = 1;
             tree->value = copy_token(tokens->value);
             tree->left = NULL;
             tree->right = NULL;
+            count++;
             break;
     }
-    
-    return tree;
+    return count;
 }
 
 int evaluate(AST * tree) {
@@ -94,8 +85,8 @@ int execute(char * input) {
     
     LinkedList * tokens = lex(input);
     
-    int consumed = 0;
-    AST * tree = parse(tokens, &consumed);
+    AST * tree = malloc(sizeof(AST));
+    parse(tree, tokens);
     
     int result = evaluate(tree);
     
@@ -108,11 +99,19 @@ int execute(char * input) {
 int core_main(int argc, const char * argv[]) {
     char input[100];
     
-    while (TRUE) {
+    printf(":> ");
+    fgets(input, 100, stdin);
+    while(strcmp(input, "q\n")) {
+        printf("   = %d\n", execute(input));
         printf(":> ");
         fgets(input, 100, stdin);
-        printf("   = %d\n", execute(input));
-    }
+    } 
 
     return 0;
 }
+
+// Just returns of evaluate
+// lex, but not tokenize
+// parse
+// free_tree
+// free_list

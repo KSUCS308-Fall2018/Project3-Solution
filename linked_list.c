@@ -10,23 +10,23 @@
 
 #include "linked_list.h"
 
-LinkedList * reverse(LinkedList * list) {
-    if (list == NULL) {
-        return NULL;
+LinkedList * append(LinkedList * head, Token * token) {
+    LinkedList * new = malloc(sizeof(LinkedList));
+    new->value = token;
+    new->next = NULL;
+    
+    if (head == NULL) {
+        return new;
     }
     
-    LinkedList * previous = NULL;
-    LinkedList * current = list;
-    LinkedList * next = NULL;
-    while (current != NULL)
-    {
-        next = current->next;
-        current->next = previous;
-        previous = current;
-        current = next;
+    LinkedList * current = head;
+    while (current->next != NULL) {
+        current = current->next;
     }
     
-    return previous;
+    current->next = new;
+    
+    return head;
 }
 
 LinkedList * advance_list(LinkedList * list, int steps) {

@@ -16,7 +16,7 @@
 #include "ast.h"
 
 LinkedList * lex(char * input);
-AST * parse(LinkedList * tokens, int * consumed);
+int parse(AST * tree, LinkedList * tokens);
 int evaluate(AST * tree);
 int execute(char * input);
 
