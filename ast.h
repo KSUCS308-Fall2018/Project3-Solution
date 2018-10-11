@@ -17,6 +17,6 @@ typedef struct AST {
     struct AST * right;
 } AST;
 
-void free_tree(AST * tree);
+void free_tree(AST *);
 
 #endif /* linked_list_h */

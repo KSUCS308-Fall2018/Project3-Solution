@@ -15,10 +15,10 @@
 #include "linked_list.h"
 #include "ast.h"
 
-LinkedList * lex(char * input);
-int parse(AST * tree, LinkedList * tokens);
-int evaluate(AST * tree);
-int execute(char * input);
+LinkedList * lex(char *);
+int parse(AST *, LinkedList *);
+int evaluate(AST *);
+int execute(char *);
 
 int core_main(int argc, const char * argv[]);
 

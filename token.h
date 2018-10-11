@@ -14,7 +14,7 @@ typedef struct Token {
     int value;
 } Token;
 
-Token * copy_token(Token * token);
-Token * tokenize(char * str, int * read);
+Token * copy_token(Token *);
+Token * tokenize(char *, int *);
 
 #endif /* token_h */
