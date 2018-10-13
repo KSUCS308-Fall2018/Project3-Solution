@@ -9,6 +9,7 @@
 //
 
 #include <string.h>
+#include <math.h>
 
 #define COLOR_RED   "\x1B[31m"
 #define COLOR_GRN   "\x1B[32m"
@@ -56,6 +57,23 @@
         } \
     } while (0)
 
+#define mu_assert_f(message, expected, actual, threshold) \
+    do { \
+        test_steps_run++; \
+        printf("\tTEST %d\t", test_steps_run); \
+        int passed = (fabs(expected - actual) < threshold); \
+        if (!passed) { \
+            test_steps_failed++; \
+            printf(COLOR_RED "FAILED" COLOR_RESET "\t"); \
+        } else {\
+            printf(COLOR_GRN "PASSED" COLOR_RESET "\t"); \
+        } \
+        printf("%s\n", message); \
+        if (!passed) { \
+            printf("\t\tExpected: %f, Recieved: %f\n", expected, actual); \
+        } \
+    } while (0)
+
 #define mu_assert_c(message, expected, actual) \
     do { \
         test_steps_run++; \
@@ -86,6 +104,38 @@
         printf("%s\n", message); \
         if (!passed) { \
             printf("\t\tExpected: '%s', Recieved: '%s'\n", expected, actual); \
+        } \
+    } while (0)
+
+#define mu_assert_not_null(message, pointer) \
+    do { \
+        test_steps_run++; \
+        printf("\tTEST %i\t", test_steps_run); \
+        if (pointer == NULL) { \
+            test_steps_failed++; \
+            printf(COLOR_RED "FAILED" COLOR_RESET "\t"); \
+        } else {\
+            printf(COLOR_GRN "PASSED" COLOR_RESET "\t"); \
+        } \
+        printf("%s\n", message); \
+        if (pointer == NULL) { \
+            printf("\t\tExpected a value, Recieved NULL"); \
+        } \
+    } while (0)
+
+#define mu_assert_null(message, pointer) \
+    do { \
+        test_steps_run++; \
+        printf("\tTEST %i\t", test_steps_run); \
+        if (pointer != NULL) { \
+            test_steps_failed++; \
+            printf(COLOR_RED "FAILED" COLOR_RESET "\t"); \
+        } else {\
+            printf(COLOR_GRN "PASSED" COLOR_RESET "\t"); \
+        } \
+        printf("%s\n", message); \
+        if (pointer != NULL) { \
+            printf("\t\tExpected a value, Recieved NULL"); \
         } \
     } while (0)
 

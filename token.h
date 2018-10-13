@@ -14,6 +14,11 @@ typedef struct Token {
     int value;
 } Token;
 
+Token * make_add_token();
+Token * make_subtract_token();
+Token * make_multiply_token();
+Token * make_integer_token(int);
+    
 Token * copy_token(Token *);
 Token * tokenize(char *, int *);
 

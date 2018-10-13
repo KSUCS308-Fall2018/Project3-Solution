@@ -62,7 +62,6 @@ int parse(AST * tree, LinkedList * tokens) {
 
 int evaluate(AST * tree) {
     if (tree == NULL) {
-        printf("Runtime error\n");
         return 0;
     }
     
@@ -101,7 +100,7 @@ int core_main(int argc, const char * argv[]) {
     
     printf(":> ");
     fgets(input, 100, stdin);
-    while(strcmp(input, "q\n")) {
+    while(strcmp(input, "q\n") && strcmp(input, "quit\n") && strcmp(input, "exit\n")) {
         printf("   = %d\n", execute(input));
         printf(":> ");
         fgets(input, 100, stdin);
@@ -111,7 +110,7 @@ int core_main(int argc, const char * argv[]) {
 }
 
 // Just returns of evaluate
-// lex, but not tokenize
+// tokenize but not lex
 // parse
 // free_tree
 // free_list

@@ -32,60 +32,76 @@ Token * copy_token(Token * token) {
     return t;
 }
 
+Token * make_add_token() {
+    Token * t = malloc(sizeof(Token));
+    t->type = ADD;
+    return t;
+}
 
-Token * tokenize(char * str, int * read) {
-    if (read == NULL) {
+Token * make_subtract_token() {
+    Token * t = malloc(sizeof(Token));
+    t->type = SUBTRACT;
+    return t;
+}
+
+Token * make_multiply_token() {
+    Token * t = malloc(sizeof(Token));
+    t->type = MULTIPLY;
+    return t;
+}
+
+Token * make_integer_token(int value) {
+    Token * t = malloc(sizeof(Token));
+    t->type = INTEGER;
+    t->value = value;
+    return t;
+}
+
+Token * tokenize(char * str, int * characters_read) {
+    if (characters_read == NULL) {
         return NULL;
     }
     
-    *read = 0;
+    *characters_read = 0;
     
     if (str == NULL) {
         return NULL;
     }
     
     while (is_whitespace(*str)) {
-        (*read)++;
+        (*characters_read)++;
         str++;
     }
     
-    Token * t = malloc(sizeof(Token));
-    
     switch (*str) {
         case '+':
-            (*read)++;
-            t->type = ADD;
-            return t;
+            (*characters_read)++;
+            return make_add_token();
             
         case '-':
-            (*read)++;
-            t->type = SUBTRACT;
-            return t;
-            
+            (*characters_read)++;
+            return make_subtract_token();
         case '*':
-            (*read)++;
-            t->type = MULTIPLY;
-            return t;
+            (*characters_read)++;
+            return make_multiply_token();
     }
     
     int value = 0;
     if (is_digit(*str)) {
         value = (*str) - '0';
-        (*read)++;
+        (*characters_read)++;
         str++;
         while (is_digit(*str)) {
             value *= 10;
             value += (*str) - '0';
-            (*read)++;
+            (*characters_read)++;
             str++;
         }
         
-        t->type = INTEGER;
-        t->value = value;
-        return t;
+        return make_integer_token(value);
     }
-    
-    free(t);
+
+    (*characters_read) = 0;
     return NULL;
 }
 
