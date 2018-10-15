@@ -86,19 +86,14 @@ Token * tokenize(char * str, int * characters_read) {
             return make_multiply_token();
     }
     
-    int value = 0;
-    if (is_digit(*str)) {
-        value = (*str) - '0';
-        (*characters_read)++;
-        str++;
-        while (is_digit(*str)) {
-            value *= 10;
-            value += (*str) - '0';
+    char * front = str;
+    if (is_digit(*front)) {
+        do {
             (*characters_read)++;
-            str++;
-        }
+            front++;
+        } while (is_digit(*front)); 
         
-        return make_integer_token(value);
+        return make_integer_token(atoi(str));
     }
 
     (*characters_read) = 0;

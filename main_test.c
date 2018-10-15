@@ -5,7 +5,6 @@
 //  Created by Ashley Coleman on 7/5/18.
 //  Copyright © 2018 Ashley Coleman. All rights reserved.
 //
-
 #include <stdio.h>
 #include <string.h>
 
@@ -15,15 +14,10 @@
 #include "token.h"
 #include "ast.h"
 
-// tokenize but not lex
-// parse
-// free_tree
-// free_list
-
 static char * test_evaluate() {
-    mu_begin_case("evaluate");
+    mu_begin_case("evaluate", 5);
     {
-        int result = evaluate(NULL);
+        int result = mu_call_func(evaluate, NULL);
         mu_assert_i("evaluate(NULL) should return 0", 0, result);
     }
 
@@ -44,7 +38,7 @@ static char * test_evaluate() {
         right.left = NULL;
         right.right = NULL;
 
-        int result = evaluate(&tree);
+        int result = mu_call_func(evaluate, &tree);
         mu_assert_i("+ 5 7 should be 12", 12, result);
     }
 
@@ -75,7 +69,7 @@ static char * test_evaluate() {
         left_right.left = NULL;
         left_right.right = NULL;
 
-        int result = evaluate(&tree);
+        int result = mu_call_func(evaluate, &tree);
         mu_assert_i("* - 4 2 15 should be 30", 30, result);
     }
 
@@ -106,7 +100,7 @@ static char * test_evaluate() {
         right_right.left = NULL;
         right_right.right = NULL;
 
-        int result = evaluate(&tree);
+        int result = mu_call_func(evaluate, &tree);
         mu_assert_i("* 3 - 1 2 should be -3", -3, result);
     }
 
@@ -157,7 +151,7 @@ static char * test_evaluate() {
         left_left_left_right.left = NULL;
         left_left_left_right.right = NULL;
 
-        int result = evaluate(&tree);
+        int result = mu_call_func(evaluate, &tree);
         mu_assert_i("+ + + + 1 1 1 1 1 should be 5", 5, result);
     }
 
@@ -166,22 +160,22 @@ static char * test_evaluate() {
 }
 
 static char * test_tokenize() {
-    mu_begin_case("tokenize");
+    mu_begin_case("tokenize", 35);
 
     {
-        Token * t = tokenize("1234", NULL);
+        Token * t = mu_call_func(tokenize, "1234", NULL);
         mu_assert_null("tokenize(\"1234\", NULL) should return NULL", t);
     }
 
     {
         int character_count;
-        Token * t = tokenize(NULL, &character_count);
+        Token * t = mu_call_func(tokenize, NULL, &character_count);
         mu_assert_null("tokenize(NULL, &character_count) should return NULL", t);
     }
 
     {
         int character_count;
-        Token * t = tokenize("+", &character_count);
+        Token * t = mu_call_func(tokenize, "+", &character_count);
         
         mu_assert_i("Assert 1 character read", 1, character_count);
         mu_assert_not_null("Assert token has value", t);
@@ -190,7 +184,7 @@ static char * test_tokenize() {
 
     {
         int character_count;
-        Token * t = tokenize("*", &character_count);
+        Token * t = mu_call_func(tokenize, "*", &character_count);
         
         mu_assert_i("Assert 1 character read", 1, character_count);
         mu_assert_not_null("Assert token has value", t);
@@ -199,7 +193,7 @@ static char * test_tokenize() {
 
     {
         int character_count;
-        Token * t = tokenize("-", &character_count);
+        Token * t = mu_call_func(tokenize, "-", &character_count);
         
         mu_assert_i("Assert 1 character read", 1, character_count);
         mu_assert_not_null("Assert token has value", t);
@@ -208,7 +202,7 @@ static char * test_tokenize() {
 
     {
         int character_count;
-        Token * t = tokenize("         \n\n\t \t +", &character_count);
+        Token * t = mu_call_func(tokenize, "         \n\n\t \t +", &character_count);
         
         mu_assert_i("Assert 16 characters read", 16, character_count);
         mu_assert_not_null("Assert token has value", t);
@@ -217,7 +211,7 @@ static char * test_tokenize() {
 
     {
         int character_count;
-        Token * t = tokenize("1", &character_count);
+        Token * t = mu_call_func(tokenize, "1", &character_count);
         
         mu_assert_i("Assert 1 character read", 1, character_count);
         mu_assert_not_null("Assert token has value", t);
@@ -227,7 +221,7 @@ static char * test_tokenize() {
 
     {
         int character_count;
-        Token * t = tokenize(" 1731", &character_count);
+        Token * t = mu_call_func(tokenize, " 1731", &character_count);
         
         mu_assert_i("Assert 5 characters read", 5, character_count);
         mu_assert_not_null("Assert token has value", t);
@@ -237,7 +231,7 @@ static char * test_tokenize() {
 
     {
         int character_count;
-        Token * t = tokenize(" - 12 99", &character_count);
+        Token * t = mu_call_func(tokenize, " - 12 99", &character_count);
         
         mu_assert_i("Assert 2 characters read", 2, character_count);
         mu_assert_not_null("Assert token has value", t);
@@ -245,18 +239,18 @@ static char * test_tokenize() {
     }
 
     {
-        int character_count;
-        Token * t = tokenize("12 99", &character_count);
+        int character_count = 0;
+        Token * t = mu_call_func(tokenize, "12 99", &character_count);
         
         mu_assert_i("Assert 2 characters read", 2, character_count);
         mu_assert_not_null("Assert token has value", t);
-        mu_assert_i("Assert integer token returned", SUBTRACT, t->type);
+        mu_assert_i("Assert integer token returned", INTEGER, t->type);
         mu_assert_i("Assert integer value correctly parsed", 12, t->value);
     }
 
     {
         int character_count;
-        Token * t = tokenize("abc", &character_count);
+        Token * t = mu_call_func(tokenize, "abc", &character_count);
         
         mu_assert_i("Assert 0 characters read", 0, character_count);
         mu_assert_null("Assert token is null for unexpected characters", t);
@@ -264,7 +258,7 @@ static char * test_tokenize() {
 
     {
         int character_count;
-        Token * t = tokenize("&#", &character_count);
+        Token * t = mu_call_func(tokenize, "&#", &character_count);
         
         mu_assert_i("Assert 0 characters read", 0, character_count);
         mu_assert_null("Assert token is null for unexpected characters", t);
@@ -272,12 +266,12 @@ static char * test_tokenize() {
 
     {
         int character_count;
-        Token * t = tokenize("  ", &character_count);
+        Token * t = mu_call_func(tokenize, "  ", &character_count);
         
         mu_assert_i("Assert 0 characters read", 0, character_count);
         mu_assert_null("Assert token is null for unexpected characters", t);
     }
-    
+
     mu_end_case("tokenize");
     return 0;
 }

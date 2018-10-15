@@ -19,20 +19,22 @@
 #ifndef min_unit_h
 #define min_unit_h
 
-#define mu_begin_case(name) \
+#define mu_begin_case(name, test_step_count) \
     do { \
         if (test_cases_run > 0) { \
             printf("\n"); \
         } \
         test_steps_run = 0; \
         test_steps_failed = 0; \
+        total_test_steps = test_step_count; \
         printf("TESTING " COLOR_YEL name COLOR_RESET ":\n"); \
     } while (0) 
 
 #define mu_end_case(name) \
     do { \
         test_cases_run++; \
-        printf("\n\t%d test steps of %d passed\n\n", test_steps_run - test_steps_failed, test_steps_run); \
+        if (test_steps_run != total_test_steps) { printf(COLOR_RED "\n\nError: test step count mismatch\n\n" COLOR_RESET); } \
+        printf("\n\t%d test steps of %d passed\n\n", test_steps_run - test_steps_failed, total_test_steps); \
         if (test_steps_failed > 0) { \
             test_cases_failed++; \
             printf("\t" COLOR_RED "FAILED" COLOR_RESET " " COLOR_YEL name COLOR_RESET "\n"); \
@@ -41,10 +43,16 @@
         } \
     } while (0) 
 
+#define mu_call_func(name, ...) \
+    ({ \
+        printf("\tCALLING " COLOR_YEL #name "(" #__VA_ARGS__ ")" COLOR_RESET ":\n"); \
+        name(__VA_ARGS__); \
+    })
+
 #define mu_assert_i(message, expected, actual) \
     do { \
         test_steps_run++; \
-        printf("\tTEST %i\t", test_steps_run); \
+        printf("\t\tTEST %d of %d\t", test_steps_run, total_test_steps); \
         if (expected != actual) { \
             test_steps_failed++; \
             printf(COLOR_RED "FAILED" COLOR_RESET "\t"); \
@@ -53,14 +61,14 @@
         } \
         printf("%s\n", message); \
         if (expected != actual) { \
-            printf("\t\tExpected: %d, Recieved: %d\n", expected, actual); \
+            printf("\t\t\tExpected: %d, Recieved: %d\n", expected, actual); \
         } \
     } while (0)
 
 #define mu_assert_f(message, expected, actual, threshold) \
     do { \
         test_steps_run++; \
-        printf("\tTEST %d\t", test_steps_run); \
+        printf("\t\tTEST %d of %d\t", test_steps_run, total_test_steps); \
         int passed = (fabs(expected - actual) < threshold); \
         if (!passed) { \
             test_steps_failed++; \
@@ -70,14 +78,14 @@
         } \
         printf("%s\n", message); \
         if (!passed) { \
-            printf("\t\tExpected: %f, Recieved: %f\n", expected, actual); \
+            printf("\t\t\tExpected: %f, Recieved: %f\n", expected, actual); \
         } \
     } while (0)
 
 #define mu_assert_c(message, expected, actual) \
     do { \
         test_steps_run++; \
-        printf("\tTEST %i\t", test_steps_run); \
+        printf("\t\tTEST %d of %d\t", test_steps_run, total_test_steps); \
         if (expected != actual) { \
             test_steps_failed++; \
             printf(COLOR_RED "FAILED" COLOR_RESET "\t"); \
@@ -86,14 +94,14 @@
         } \
         printf("%s\n", message); \
         if (expected != actual) { \
-            printf("\t\tExpected: '%c', Recieved: '%c'\n", expected, actual); \
+            printf("\t\t\tExpected: '%c', Recieved: '%c'\n", expected, actual); \
         } \
     } while (0)
 
 #define mu_assert_s(message, expected, actual) \
     do { \
         test_steps_run++; \
-        printf("\tTEST %i\t", test_steps_run); \
+        printf("\t\tTEST %d of %d\t", test_steps_run, total_test_steps); \
         int passed = (strcmp(expected, actual) == 0); \
         if (!passed) { \
             test_steps_failed++; \
@@ -103,14 +111,14 @@
         } \
         printf("%s\n", message); \
         if (!passed) { \
-            printf("\t\tExpected: '%s', Recieved: '%s'\n", expected, actual); \
+            printf("\t\t\tExpected: '%s', Recieved: '%s'\n", expected, actual); \
         } \
     } while (0)
 
 #define mu_assert_not_null(message, pointer) \
     do { \
         test_steps_run++; \
-        printf("\tTEST %i\t", test_steps_run); \
+        printf("\t\tTEST %d of %d\t", test_steps_run, total_test_steps); \
         if (pointer == NULL) { \
             test_steps_failed++; \
             printf(COLOR_RED "FAILED" COLOR_RESET "\t"); \
@@ -119,14 +127,14 @@
         } \
         printf("%s\n", message); \
         if (pointer == NULL) { \
-            printf("\t\tExpected a value, Recieved NULL"); \
+            printf("\t\t\tExpected a value, Recieved NULL"); \
         } \
     } while (0)
 
 #define mu_assert_null(message, pointer) \
     do { \
         test_steps_run++; \
-        printf("\tTEST %i\t", test_steps_run); \
+        printf("\t\tTEST %d of %d\t", test_steps_run, total_test_steps); \
         if (pointer != NULL) { \
             test_steps_failed++; \
             printf(COLOR_RED "FAILED" COLOR_RESET "\t"); \
@@ -135,7 +143,7 @@
         } \
         printf("%s\n", message); \
         if (pointer != NULL) { \
-            printf("\t\tExpected a value, Recieved NULL"); \
+            printf("\t\t\tExpected a value, Recieved NULL"); \
         } \
     } while (0)
 
@@ -152,6 +160,7 @@
 
 int test_steps_run = 0;
 int test_steps_failed = 0;
+int total_test_steps = 0;
 
 int test_cases_run = 0;
 int test_cases_failed = 0;
