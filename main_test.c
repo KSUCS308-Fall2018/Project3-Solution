@@ -276,9 +276,111 @@ static char * test_tokenize() {
     return 0;
 }
 
+
+static char * test_parse() {
+    mu_begin_case("parse", 36);
+
+    {
+        AST tree;
+        int consumed = mu_call_func(parse, &tree, NULL);
+        mu_assert_i("parse(&tree, NULL) should return 0", 0, consumed);
+    }
+
+    {
+        LinkedList l;
+        int consumed = mu_call_func(parse, NULL, &l);
+        mu_assert_i("parse(&tree, NULL) should return 0", 0, consumed);
+    }
+
+    {
+        AST tree;
+
+        LinkedList * head = append(NULL, make_add_token());
+        head = append(head, make_integer_token(1));
+        head = append(head, make_integer_token(2));
+
+        int consumed = mu_call_func(parse, &tree, head);
+
+        mu_assert_i("Assert 3 items consumed", 3, consumed);
+        mu_assert_i("Assert root is ADD token", ADD, tree.value->type);
+
+        mu_assert_not_null("Assert left node has value", tree.left);
+        mu_assert_i("Assert left token is INTEGER token", INTEGER, tree.left->value->type);
+        mu_assert_i("Assert left token has value 1", 1, tree.left->value->value);
+
+        mu_assert_not_null("Assert right node has value", tree.right);
+        mu_assert_i("Assert right token is INTEGER token", INTEGER, tree.right->value->type);
+        mu_assert_i("Assert right token has value 2", 2, tree.right->value->value);
+    }
+
+    {
+        AST tree;
+
+        LinkedList * head = append(NULL, make_multiply_token());
+        head = append(head, make_subtract_token());
+        head = append(head, make_integer_token(1));
+        head = append(head, make_integer_token(2));
+        head = append(head, make_integer_token(3));
+
+        int consumed = mu_call_func(parse, &tree, head);
+
+        mu_assert_i("Assert 5 items consumed", 5, consumed);
+        mu_assert_i("Assert root is MULTIPLY token", MULTIPLY, tree.value->type);
+
+        mu_assert_not_null("Assert left node has value", tree.left);
+        mu_assert_i("Assert left token is SUBTRACT token", SUBTRACT, tree.left->value->type);
+
+        mu_assert_not_null("Assert right node has value", tree.right);
+        mu_assert_i("Assert right token is INTEGER token", INTEGER, tree.right->value->type);
+        mu_assert_i("Assert right token has value 3", 3, tree.right->value->value);
+
+        mu_assert_not_null("Assert left left node has value", tree.left->left);
+        mu_assert_i("Assert left left token is INTEGER token", INTEGER, tree.left->left->value->type);
+        mu_assert_i("Assert left left token has value 1", 1, tree.left->left->value->value);
+
+        mu_assert_not_null("Assert left right node has value", tree.left->right);
+        mu_assert_i("Assert left right token is INTEGER token", INTEGER, tree.left->right->value->type);
+        mu_assert_i("Assert left right token has value 2", 2, tree.left->right->value->value);
+    }
+
+    {
+        AST tree;
+
+        LinkedList * head = append(NULL, make_multiply_token());
+        head = append(head, make_integer_token(1));
+        head = append(head, make_multiply_token());
+        head = append(head, make_integer_token(2));
+        head = append(head, make_integer_token(3));
+
+        int consumed = mu_call_func(parse, &tree, head);
+
+        mu_assert_i("Assert 5 items consumed", 5, consumed);
+        mu_assert_i("Assert root is MULTIPLY token", MULTIPLY, tree.value->type);
+
+        mu_assert_not_null("Assert left node has value", tree.left);
+        mu_assert_i("Assert left token is INTEGER token", INTEGER, tree.left->value->type);
+        mu_assert_i("Assert left token has value 1", 1, tree.left->value->value);
+
+        mu_assert_not_null("Assert right node has value", tree.right);
+        mu_assert_i("Assert right token is MULTIPLY token", MULTIPLY, tree.right->value->type);
+
+        mu_assert_not_null("Assert right left node has value", tree.right->left);
+        mu_assert_i("Assert right left token is INTEGER token", INTEGER, tree.right->left->value->type);
+        mu_assert_i("Assert right left token has value 2", 2, tree.right->left->value->value);
+
+        mu_assert_not_null("Assert right right node has value", tree.right->right);
+        mu_assert_i("Assert right right token is INTEGER token", INTEGER, tree.right->right->value->type);
+        mu_assert_i("Assert right right token has value 3", 3, tree.right->right->value->value);
+    }
+
+    mu_end_case("parse");
+    return 0;
+}
+
 static char * all_tests() {
     test_evaluate();
     test_tokenize();
+    test_parse();
     return 0;
 }
 
