@@ -83,6 +83,11 @@ int execute(char * input) {
     }
     
     LinkedList * tokens = lex(input);
+
+    if (tokens == NULL) {
+        printf("Syntax error\n");
+        return 0;
+    }
     
     AST * tree = malloc(sizeof(AST));
     parse(tree, tokens);
