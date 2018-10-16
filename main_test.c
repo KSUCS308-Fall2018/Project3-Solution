@@ -179,7 +179,11 @@ static char * test_tokenize() {
         
         mu_assert_i("Assert 1 character read", 1, character_count);
         mu_assert_not_null("Assert token has value", t);
-        mu_assert_i("Assert add token returned", ADD, t->type);
+        if (t != NULL) {
+            mu_assert_i("Assert add token returned", ADD, t->type);
+        } else {
+            mu_assert_i("(SKIPPING) Assert add token returned", ADD, SUBTRACT);
+        }
     }
 
     {
@@ -188,7 +192,11 @@ static char * test_tokenize() {
         
         mu_assert_i("Assert 1 character read", 1, character_count);
         mu_assert_not_null("Assert token has value", t);
-        mu_assert_i("Assert multiply token returned", MULTIPLY, t->type);
+        if (t != NULL) {
+            mu_assert_i("Assert multiply token returned", MULTIPLY, t->type);
+        } else {
+            mu_assert_i("(SKIPPING) Assert multiply token returned", MULTIPLY, ADD);
+        }
     }
 
     {
@@ -196,8 +204,13 @@ static char * test_tokenize() {
         Token * t = mu_call_func(tokenize, "-", &character_count);
         
         mu_assert_i("Assert 1 character read", 1, character_count);
+        
         mu_assert_not_null("Assert token has value", t);
-        mu_assert_i("Assert subtract token returned", SUBTRACT, t->type);
+        if (t != NULL) {
+            mu_assert_i("Assert subtract token returned", SUBTRACT, t->type);
+        } else {
+            mu_assert_i("(SKIPPING) Assert subtract token returned", SUBTRACT, ADD);
+        }
     }
 
     {
@@ -206,7 +219,11 @@ static char * test_tokenize() {
         
         mu_assert_i("Assert 16 characters read", 16, character_count);
         mu_assert_not_null("Assert token has value", t);
-        mu_assert_i("Assert subtract token returned", ADD, t->type);
+        if (t != NULL) {
+            mu_assert_i("Assert subtract token returned", ADD, t->type);
+        } else {
+            mu_assert_i("(SKIPPING) Assert subtract token returned", ADD, SUBTRACT);
+        }
     }
 
     {
@@ -215,8 +232,13 @@ static char * test_tokenize() {
         
         mu_assert_i("Assert 1 character read", 1, character_count);
         mu_assert_not_null("Assert token has value", t);
-        mu_assert_i("Assert integer token returned", INTEGER, t->type);
-        mu_assert_i("Assert integer value correctly parsed", 1, t->value);
+        if (t != NULL) {
+            mu_assert_i("Assert integer token returned", INTEGER, t->type);
+            mu_assert_i("Assert integer value correctly parsed", 1, t->value);
+        } else {
+            mu_assert_i("(SKIPPING) Assert integer token returned", INTEGER, ADD);
+            mu_assert_i("(SKIPPING) Assert integer value correctly parsed", 1, 0);
+        }
     }
 
     {
@@ -225,8 +247,13 @@ static char * test_tokenize() {
         
         mu_assert_i("Assert 5 characters read", 5, character_count);
         mu_assert_not_null("Assert token has value", t);
-        mu_assert_i("Assert integer token returned", INTEGER, t->type);
-        mu_assert_i("Assert integer value correctly parsed", 1731, t->value);
+        if (t != NULL) {
+            mu_assert_i("Assert integer token returned", INTEGER, t->type);
+            mu_assert_i("Assert integer value correctly parsed", 1731, t->value);
+        } else {
+            mu_assert_i("(SKIPPING) Assert integer token returned", INTEGER, ADD);
+            mu_assert_i("(SKIPPING) Assert integer value correctly parsed", 1731, 0);
+        }
     }
 
     {
@@ -235,7 +262,11 @@ static char * test_tokenize() {
         
         mu_assert_i("Assert 2 characters read", 2, character_count);
         mu_assert_not_null("Assert token has value", t);
-        mu_assert_i("Assert subtract token returned", SUBTRACT, t->type);
+        if (t != NULL) {
+            mu_assert_i("Assert subtract token returned", SUBTRACT, t->type);
+        } else {
+            mu_assert_i("(SKIPPING) Assert subtract token returned", SUBTRACT, ADD);
+        }
     }
 
     {
@@ -244,8 +275,14 @@ static char * test_tokenize() {
         
         mu_assert_i("Assert 2 characters read", 2, character_count);
         mu_assert_not_null("Assert token has value", t);
-        mu_assert_i("Assert integer token returned", INTEGER, t->type);
-        mu_assert_i("Assert integer value correctly parsed", 12, t->value);
+
+        if (t != NULL) {
+            mu_assert_i("Assert integer token returned", INTEGER, t->type);
+            mu_assert_i("Assert integer value correctly parsed", 12, t->value);
+        } else {
+            mu_assert_i("(SKIPPING) Assert integer token returned", INTEGER, ADD);
+            mu_assert_i("(SKIPPING) Assert integer value correctly parsed", 12, 0);
+        }
     }
 
     {
@@ -294,6 +331,8 @@ static char * test_parse() {
 
     {
         AST tree;
+        tree.left = NULL;
+        tree.right = NULL;
 
         LinkedList * head = append(NULL, make_add_token());
         head = append(head, make_integer_token(1));
@@ -305,16 +344,28 @@ static char * test_parse() {
         mu_assert_i("Assert root is ADD token", ADD, tree.value->type);
 
         mu_assert_not_null("Assert left node has value", tree.left);
-        mu_assert_i("Assert left token is INTEGER token", INTEGER, tree.left->value->type);
-        mu_assert_i("Assert left token has value 1", 1, tree.left->value->value);
+        if (tree.left != NULL) {
+            mu_assert_i("Assert left token is INTEGER token", INTEGER, tree.left->value->type);
+            mu_assert_i("Assert left token has value 1", 1, tree.left->value->value);
+        } else {
+            mu_assert_i("(SKIPPING) Assert left token is INTEGER token", INTEGER, MULTIPLY);
+            mu_assert_i("(SKIPPING) Assert left token has value 1", 1, 0);
+        }
 
         mu_assert_not_null("Assert right node has value", tree.right);
-        mu_assert_i("Assert right token is INTEGER token", INTEGER, tree.right->value->type);
-        mu_assert_i("Assert right token has value 2", 2, tree.right->value->value);
+        if (tree.right != NULL) {
+            mu_assert_i("Assert right token is INTEGER token", INTEGER, tree.right->value->type);
+            mu_assert_i("Assert right token has value 2", 2, tree.right->value->value);
+        } else {
+            mu_assert_i("(SKIPPING) Assert right token is INTEGER token", INTEGER, MULTIPLY);
+            mu_assert_i("(SKIPPING) Assert right token has value 2", 2, 0);
+        }
     }
 
     {
         AST tree;
+        tree.left = NULL;
+        tree.right = NULL;
 
         LinkedList * head = append(NULL, make_multiply_token());
         head = append(head, make_subtract_token());
@@ -328,23 +379,54 @@ static char * test_parse() {
         mu_assert_i("Assert root is MULTIPLY token", MULTIPLY, tree.value->type);
 
         mu_assert_not_null("Assert left node has value", tree.left);
-        mu_assert_i("Assert left token is SUBTRACT token", SUBTRACT, tree.left->value->type);
+        if (tree.left != NULL) {
+            mu_assert_i("Assert left token is SUBTRACT token", SUBTRACT, tree.left->value->type);
+        } else {
+            mu_assert_i("(SKIPPING) Assert left token is SUBTRACT token", SUBTRACT, ADD);
+        }
 
         mu_assert_not_null("Assert right node has value", tree.right);
-        mu_assert_i("Assert right token is INTEGER token", INTEGER, tree.right->value->type);
-        mu_assert_i("Assert right token has value 3", 3, tree.right->value->value);
+        if (tree.right != NULL) {
+            mu_assert_i("Assert right token is INTEGER token", INTEGER, tree.right->value->type);
+            mu_assert_i("Assert right token has value 3", 3, tree.right->value->value);
+        } else {
+            mu_assert_i("(SKIPPING) Assert right token is INTEGER token", INTEGER, ADD);
+            mu_assert_i("(SKIPPING) Assert right token has value 3", 3, 0);
+        }
 
-        mu_assert_not_null("Assert left left node has value", tree.left->left);
-        mu_assert_i("Assert left left token is INTEGER token", INTEGER, tree.left->left->value->type);
-        mu_assert_i("Assert left left token has value 1", 1, tree.left->left->value->value);
+        if (tree.left != NULL) {
+            mu_assert_not_null("Assert left left node has value", tree.left->left);
+        } else {
+            mu_assert_not_null("(SKIPPING) Assert left left node has value", NULL);
+        }
 
-        mu_assert_not_null("Assert left right node has value", tree.left->right);
-        mu_assert_i("Assert left right token is INTEGER token", INTEGER, tree.left->right->value->type);
-        mu_assert_i("Assert left right token has value 2", 2, tree.left->right->value->value);
+        if (tree.left != NULL && tree.left->left != NULL){
+            mu_assert_i("Assert left left token is INTEGER token", INTEGER, tree.left->left->value->type);
+            mu_assert_i("Assert left left token has value 1", 1, tree.left->left->value->value);
+        } else {
+            mu_assert_i("(SKIPPING) Assert left left token is INTEGER token", INTEGER, ADD);
+            mu_assert_i("(SKIPPING) Assert left left token has value 1", 1, 0);
+        }
+
+        if (tree.left != NULL) {
+            mu_assert_not_null("Assert left right node has value", tree.left->right);
+        } else {
+            mu_assert_not_null("(SKIPPING) Assert left right node has value", NULL);
+        }
+
+        if (tree.left != NULL && tree.left->right) {
+            mu_assert_i("Assert left right token is INTEGER token", INTEGER, tree.left->right->value->type);
+            mu_assert_i("Assert left right token has value 2", 2, tree.left->right->value->value);
+        } else {
+            mu_assert_i("(SKIPPING) Assert left right token is INTEGER token", INTEGER, ADD);
+            mu_assert_i("(SKIPPING) Assert left right token has value 2", 2, 0);
+        }
     }
 
     {
         AST tree;
+        tree.left = NULL;
+        tree.right = NULL;
 
         LinkedList * head = append(NULL, make_multiply_token());
         head = append(head, make_integer_token(1));
@@ -358,19 +440,48 @@ static char * test_parse() {
         mu_assert_i("Assert root is MULTIPLY token", MULTIPLY, tree.value->type);
 
         mu_assert_not_null("Assert left node has value", tree.left);
-        mu_assert_i("Assert left token is INTEGER token", INTEGER, tree.left->value->type);
-        mu_assert_i("Assert left token has value 1", 1, tree.left->value->value);
+        if (tree.left != NULL) {
+            mu_assert_i("Assert left token is INTEGER token", INTEGER, tree.left->value->type);
+            mu_assert_i("Assert left token has value 1", 1, tree.left->value->value);
+        } else {
+            mu_assert_i("(SKIPPING) Assert left token is INTEGER token", INTEGER, ADD);
+            mu_assert_i("(SKIPPING) Assert left token has value 1", 1, 0);
+        }
 
         mu_assert_not_null("Assert right node has value", tree.right);
-        mu_assert_i("Assert right token is MULTIPLY token", MULTIPLY, tree.right->value->type);
+        if (tree.right != NULL) {
+            mu_assert_i("Assert right token is MULTIPLY token", MULTIPLY, tree.right->value->type);
+        } else {
+            mu_assert_i("(SKIPPING) Assert right token is MULTIPLY token", MULTIPLY, ADD);
+        }
 
-        mu_assert_not_null("Assert right left node has value", tree.right->left);
-        mu_assert_i("Assert right left token is INTEGER token", INTEGER, tree.right->left->value->type);
-        mu_assert_i("Assert right left token has value 2", 2, tree.right->left->value->value);
+        if (tree.right != NULL) {
+            mu_assert_not_null("Assert right left node has value", tree.right->left);
+        } else {
+            mu_assert_not_null("(SKIPPING) Assert right left node has value", NULL);
+        }
 
-        mu_assert_not_null("Assert right right node has value", tree.right->right);
-        mu_assert_i("Assert right right token is INTEGER token", INTEGER, tree.right->right->value->type);
-        mu_assert_i("Assert right right token has value 3", 3, tree.right->right->value->value);
+        if (tree.right != NULL && tree.right->left != NULL) {
+            mu_assert_i("Assert right left token is INTEGER token", INTEGER, tree.right->left->value->type);
+            mu_assert_i("Assert right left token has value 2", 2, tree.right->left->value->value);
+        } else {
+            mu_assert_i("(SKIPPING) Assert right left token is INTEGER token", INTEGER, ADD);
+            mu_assert_i("(SKIPPING) Assert right left token has value 2", 2, 0);
+        }
+
+        if (tree.right != NULL) {
+            mu_assert_not_null("Assert right right node has value", tree.right->right);
+        } else {
+            mu_assert_not_null("(SKIPPING) Assert right right node has value", NULL);
+        }
+
+        if (tree.right != NULL && tree.right->right != NULL) {
+            mu_assert_i("Assert right right token is INTEGER token", INTEGER, tree.right->right->value->type);
+            mu_assert_i("Assert right right token has value 3", 3, tree.right->right->value->value);
+        } else {
+            mu_assert_i("(SKIPPING) Assert right right token is INTEGER token", INTEGER, ADD);
+            mu_assert_i("(SKIPPING) Assert right right token has value 3", 3, 0);
+        }
     }
 
     mu_end_case("parse");
